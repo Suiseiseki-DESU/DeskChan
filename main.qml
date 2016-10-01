@@ -9,12 +9,12 @@ import "scripts/talk.js" as Talk
 ApplicationWindow {
     id: root
 
-    x: 100;
-    y: 100;
+    x: Screen.width - img.width - 10;
+    y: Screen.height;
 
     visible: true
-    width: img.width
-    height: img.height
+    width: Screen.width
+    height: Screen.height
     title: "lorm"
     onClosing: Qt.quit();
 
@@ -23,8 +23,9 @@ ApplicationWindow {
 
     Rectangle {
         id: exitButton
-        x: 10;
-        y: 10;
+        x: img.x - 10;
+        y: img.y;
+        z: 100;
         width: 50;
         height: 50;
         color: "#ff0000";
@@ -41,12 +42,12 @@ ApplicationWindow {
         }
     }
 
-    Rectangle {
+    /*Rectangle {
         id: balloon
-        x: 300
-        y: 10
-        width: 100
-        height: 100
+        x: img.width + img.x
+        y: img.y
+        width: balloonLabel.width + 32
+        height: balloonLabel.maximumLineCount * balloonLabel.font.pixelSize
         color: "white"
 
         radius: 20
@@ -57,16 +58,47 @@ ApplicationWindow {
         Label {
             anchors.centerIn: parent
             id: balloonLabel
-            text: "hello"
-            font.family: "Arial"
+            text: "Панк - это дерзость\n и молодость мира! F.P.G"
+            textFormat: Text.AutoText
+            verticalAlignment: Text.AlignVCenter
+            font.family: "Anime Ace V02"
+            font.weight: Font.Normal
             font.pixelSize: 12
+            horizontalAlignment: Text.AlignHCenter
+            maximumLineCount: 12
         }
-    }
+    }*/
+
+    Image {
+            id: balloon
+
+            source: "assets/balloon_right_oriented.svg"
+
+            x: img.width + img.x
+            y: img.y
+            sourceSize.width: balloonLabel.contentWidth + 32
+            sourceSize.height: balloonLabel.contentHeight * balloonLabel.font.pixelSize
+
+            Label {
+                anchors.centerIn: parent
+                id: balloonLabel
+                text: "Панк - это дерзость \nи молодость мира! F.P.G"
+                textFormat: Text.AutoText
+                verticalAlignment: Text.AlignVCenter
+                font.family: "Anime Ace V02"
+                font.weight: Font.Normal
+                font.pixelSize: 12
+                horizontalAlignment: Text.AlignHCenter
+                maximumLineCount: 12
+                wrapMode: Text.Wrap
+            }
+        }
 
     Image {
 
         id: img;
         source: "assets/front.png";
+
 
         onXChanged: {
             if(imageMouseArea.drag.active){
@@ -88,14 +120,8 @@ ApplicationWindow {
                 axis: Drag.XandYAxis
             }
             onClicked: {
-                move();
+                img.source = imageMouseArea.containsMouse && img.source == "assets/front.png" ? "assets/back.png" : "assets/front.png";
                 Talk.reactOnAction();
-            }
-            function move()
-            {
-                var front  = "/assets/front.png";
-                var back = "/assets/back.png";
-                img.source = ((img.source == front) ? back : front);
             }
         }
     }
