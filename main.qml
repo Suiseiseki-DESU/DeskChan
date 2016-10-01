@@ -22,7 +22,7 @@ ApplicationWindow {
     title: "lorm"
     onClosing: Qt.quit();
 
-    flags: Qt.ToolTip | Qt.FramelessWindowHint | Qt.WA_TranslucentBackground | Qt.WindowStaysOnTopHint | Qt.BypassGraphicsProxyWidget
+    flags: Qt.ToolTip | Qt.FramelessWindowHint | Qt.WA_TranslucentBackground | Qt.WindowStaysOnTopHint | Qt.BypassGraphicsProxyWidget | Qt.SubWindow
     color: "transparent"
 
     Image {
@@ -141,8 +141,8 @@ ApplicationWindow {
                     font.weight: Font.DemiBold
                     font.pointSize: 12
 
-                    maximumLength: 9
-                    validator: RegExpValidator { regExp: /^[a-zA-Zа-яА-Я-]*$/ }
+                    maximumLength: 11
+                    validator: RegExpValidator { regExp: /^[a-zA-Zа-яА-Я- ]*$/ }
 
                     onAccepted: {
                         console.log("set default user: ", text)
@@ -155,11 +155,11 @@ ApplicationWindow {
         }
 
     Image {
-
         id: img;
-        x: 0
-        y: 0
-        source: "assets/front.png";
+
+        mipmap: true
+        source: img.mipmap ? "assets/front.png" : "assets/back.png";
+        cache: false;
 
 
         onXChanged: {
@@ -176,21 +176,35 @@ ApplicationWindow {
 
         MouseArea {
             id: imageMouseArea;
-            anchors.fill: parent;
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.OpenHandCursor
             drag {
                 minimumX: 10
                 minimumY: 10
                 maximumX: Screen.width - img.width - balloon.paintedWidth
                 maximumY: Screen.height - img.height
                 target: img;
-                axis: Drag.XandYAxis
+                axis: Drag.XAndYAxis
             }
             onClicked: {
+                //img.source = "assets/back.png";
                 //Talk.reactOnAction();
                 //Talk.getRandomPhrase();
             }
+            onPressed: {
+                imageMouseArea.cursorShape = Qt.ClosedHandCursor;
+            }
+            onReleased: {
+                imageMouseArea.cursorShape = Qt.OpenHandCursor;
+            }
             onPressAndHold: {
                 console.log("Enable zoom");
+            }
+            onWheel: {
+                if (wheel.modifiers && Qt.ControlModifier) {
+                    img.scale = wheel.angleDelta.y / 120;
+                }
             }
         }
         Timer {
@@ -213,9 +227,8 @@ ApplicationWindow {
         folder: shortcuts.home
         nameFilters: [ "Image file (*.svg *.png)" ]
         onAccepted: {
-            img.source = selectGirlDialog.fileUrl.toString()
-            img.x = 0
-            img.y = 0
+            img.source = selectGirlDialog.fileUrl.toString();
+            img.transformOrigin = Image.Center;
             console.log("You chose: " + selectGirlDialog.fileUrls)
             close();
         }
