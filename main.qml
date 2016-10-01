@@ -11,7 +11,9 @@ import "ui"
 ApplicationWindow {
     id: root
 
-    x: Screen.width - img.width - 10;
+    property int offset: 25
+
+    x: Screen.width - img.width - offset;
     y: Screen.height;
 
     visible: true
@@ -20,12 +22,12 @@ ApplicationWindow {
     title: "lorm"
     onClosing: Qt.quit();
 
-    flags: Qt.ToolTip | Qt.FramelessWindowHint | Qt.WA_TranslucentBackground | Qt.WindowStaysOnTopHint
+    flags: Qt.ToolTip | Qt.FramelessWindowHint | Qt.WA_TranslucentBackground | Qt.WindowStaysOnTopHint | Qt.BypassGraphicsProxyWidget
     color: "transparent"
 
     Image {
         id: exitButton
-        x: img.x - 10;
+        x: img.x - offset;
         y: img.y;
         z: 100;
         width: 80;
@@ -46,8 +48,8 @@ ApplicationWindow {
 
     Image {
         id: uploadButton
-        x: img.x - 10;
-        y: img.y + height + 10;
+        x: img.x - offset;
+        y: img.y + height + offset;
         z: 100;
         width: 80;
         height: 80;
@@ -67,14 +69,15 @@ ApplicationWindow {
 
     Image {
             id: balloon
+            visible: false
 
             source: "assets/balloon_right_oriented.svg"
 
             x: img.width + img.x
             y: img.y
 
-            sourceSize.width: balloonLabel.contentWidth + 50
-            sourceSize.height: 200
+            sourceSize.width: balloonLabel.contentWidth + 100
+            sourceSize.height: 300
 
             Label {
                 anchors.centerIn: parent
@@ -83,16 +86,72 @@ ApplicationWindow {
                 height: parent.sourceSize.height - 20
 
                 id: balloonLabel
-                text: "Панк - это дерзость \nи молодость мира! F.P.G"
+                text: "Deskchan v.0.1 Preview \nDesigned and developed by Deskchan Project crew"
                 textFormat: Text.AutoText
+                lineHeight: 1.25
                 verticalAlignment: Text.AlignVCenter
                 font.family: "Anime Ace V02"
                 font.weight: Font.Normal
-                font.pixelSize: 12
+                font.pointSize: 10
                 horizontalAlignment: Text.AlignHCenter
                 wrapMode: Text.WordWrap
             }
 
+        }
+
+    Image {
+            id: balloonWelcome
+
+            source: "assets/balloon_right_oriented.svg"
+
+            x: img.width + img.x
+            y: img.y
+
+            sourceSize.width: balloonWelcomeLabel.contentWidth + 100
+            sourceSize.height: 300
+
+            Label {
+                anchors.centerIn: parent
+
+                width: 200
+                height: parent.sourceSize.height - 20
+
+                id: balloonWelcomeLabel
+                text: "Привет! Я Deskchan v 0.0.1 Preview. Как мне к тебе обращаться?"
+                textFormat: Text.AutoText
+                lineHeight: 1.25
+                verticalAlignment: Text.AlignVCenter
+                font.family: "Anime Ace V02"
+                font.weight: Font.Normal
+                font.pointSize: 10
+                horizontalAlignment: Text.AlignHCenter
+                wrapMode: Text.WordWrap
+            }
+                TextInput {
+                    id:ballonUsernameInput
+                    width: 120
+                    height: 40
+                    horizontalAlignment: TextInput.AlignHCenter
+                    x: 70
+                    y: 200
+
+                    color: "orange"
+                    text: "faggot"
+                    font.family: "Anime Ace V02"
+                    font.weight: Font.DemiBold
+                    font.pointSize: 12
+
+                    maximumLength: 9
+                    validator: RegExpValidator { regExp: /^[a-zA-Zа-яА-Я-]*$/ }
+
+                    onAccepted: {
+                        console.log("set default user: ", text)
+                        Talk.defaultUser = text
+                        balloonWelcome.visible = false;
+                        balloon.visible = true;
+                        timer.running = true;
+                    }
+            }
         }
 
     Image {
@@ -105,13 +164,13 @@ ApplicationWindow {
 
         onXChanged: {
             if(imageMouseArea.drag.active){
-                console.log("img x = " + x);
+                //console.log("img x = " + x);
             }
         }
 
         onYChanged: {
             if(imageMouseArea.drag.active){
-                console.log("img y = " + y);
+                //console.log("img y = " + y);
             }
         }
 
@@ -119,22 +178,32 @@ ApplicationWindow {
             id: imageMouseArea;
             anchors.fill: parent;
             drag {
+                minimumX: 10
+                minimumY: 10
+                maximumX: Screen.width - img.width - balloon.paintedWidth
+                maximumY: Screen.height - img.height
                 target: img;
                 axis: Drag.XandYAxis
             }
             onClicked: {
                 //Talk.reactOnAction();
-                Talk.getRandomPhrase();
+                //Talk.getRandomPhrase();
             }
             onPressAndHold: {
                 console.log("Enable zoom");
             }
         }
         Timer {
-            interval: Math.random() * 10000;
-            running: true;
+            id: timer
+            interval: Math.round(Math.random() * (6000 - 2000)) + 2000;
+            running: false;
             repeat: true;
-            onTriggered: Talk.getRandomPhrase();
+            onTriggered: {
+                //Время высказывания высчитывается по формуле: кол-во букв * кол-во секунд на букву + кол-во пробело
+                interval = Math.round(Math.random() * (6000 - 2000)) + 2000;
+                console.log("phrase interval is", interval);
+                Talk.getRandomPhrase();
+            }
         }
     }
 

@@ -1,17 +1,28 @@
 var phrases = [];
+var defaultUser = "";
+var userPattern = "%USERNAME%";
+var API_URL = "https://sheets.googleapis.com/v4/spreadsheets/17qf7fRewpocQ_TT4FoKWQ3p7gU7gj4nFLbs2mJtBe_k/values/A2:A103";
+var API_KEY = "?key=AIzaSyDExsxzBLRZgPt1mBKtPCcSDyGgsjM3_uI";
 
 function reactOnAction() {
-    setTimeout(getRandomPhrase(), Math.floor(Math.random() * 10));
+    setTimeout(getRandomPhrase(), Math.round(Math.random() * 10));
 }
 
 function move() {
+    //TODO
+}
 
+function calculateSpeakInterval(phrase)
+{
+    var lettersCount = phrase.replace(/\s+/g, '').length;
+    var letterSpeakTime = 800; //msecs
+    return lettersCount * letterSpeakTime;
 }
 
 function getRandomPhrase()
 {
     if (typeof phrases !== 'undefined' && phrases.length > 0) {
-        balloonLabel.text = phrases[Math.floor( Math.random() * phrases.length )].toString();
+        balloonLabel.text = phrases[Math.round( Math.random() * phrases.length )].toString().replace(userPattern, defaultUser);
     } else {
         getPhrases();
     }
@@ -20,7 +31,7 @@ function getRandomPhrase()
 
 function getPhrases() {
     var request = new XMLHttpRequest();
-    request.open('GET', "https://sheets.googleapis.com/v4/spreadsheets/17qf7fRewpocQ_TT4FoKWQ3p7gU7gj4nFLbs2mJtBe_k/values/A1:A100?key=AIzaSyDExsxzBLRZgPt1mBKtPCcSDyGgsjM3_uI")
+    request.open('GET', "https://sheets.googleapis.com/v4/spreadsheets/17qf7fRewpocQ_TT4FoKWQ3p7gU7gj4nFLbs2mJtBe_k/values/A2:A103?key=AIzaSyDExsxzBLRZgPt1mBKtPCcSDyGgsjM3_uI")
 
     request.onreadystatechange = function() {
         if(request.readyState === XMLHttpRequest.DONE)
@@ -28,8 +39,9 @@ function getPhrases() {
             console.log("response got! ", request.responseText.length);
             var result = JSON.parse(request.responseText);
             phrases = result["values"];
-        } else {
-            console.log("fail :( ", request.status);
+        }
+        if(request.status !== 200) {
+            console.log("Can't connect to network, status code: ", request.status);
         }
     }
 
