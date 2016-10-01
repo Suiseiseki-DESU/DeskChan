@@ -21,5 +21,6 @@
         <file>assets/balloon_left_oriented.svg</file>
         <file>assets/balloon_right_oriented.png</file>
         <file>assets/balloon_right_oriented.svg</file>
+        <file>assets/close.png</file>
     </qresource>
 </RCC>

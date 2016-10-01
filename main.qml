@@ -21,22 +21,22 @@ ApplicationWindow {
     flags: Qt.ToolTip | Qt.FramelessWindowHint | Qt.WA_TranslucentBackground | Qt.WindowStaysOnTopHint
     color: "transparent"
 
-    Rectangle {
+    Image {
         id: exitButton
         x: img.x - 10;
         y: img.y;
         z: 100;
-        width: 50;
-        height: 50;
-        color: "#ff0000";
-        radius: 50;
+        width: 100;
+        height: 100;
+
+        source: "assets/close.png"
 
         MouseArea {
             width: exitButton.width
             height: exitButton.height
             anchors.fill: parent;
             onClicked: {
-                console.log("on exit circle clicked");
+                console.log("on exit cross clicked");
                 Qt.quit();
             }
         }
