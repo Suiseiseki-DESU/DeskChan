@@ -1,0 +1,21 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>MainForm.ui.qml</file>
+        <file>icons/bow-tie.svg</file>
+        <file>icons/dress.svg</file>
+        <file>icons/ear-lobe-side-view-outline.svg</file>
+        <file>icons/face-of-a-woman-outline.svg</file>
+        <file>icons/long-wavy-hair-variant.svg</file>
+        <file>icons/male-arm-muscles.svg</file>
+        <file>icons/panties.svg</file>
+        <file>icons/people.svg</file>
+        <file>icons/skirt.svg</file>
+        <file>icons/upper-torso-of-a-woman.svg</file>
+        <file>ui/VerticalTabBar.qml</file>
+        <file>assets/back.png</file>
+        <file>assets/front.png</file>
+        <file>main.cpp</file>
+        <file>scripts/talk.js</file>
+    </qresource>
+</RCC>
