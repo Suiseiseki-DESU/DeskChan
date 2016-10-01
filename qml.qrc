@@ -22,5 +22,7 @@
         <file>assets/balloon_right_oriented.png</file>
         <file>assets/balloon_right_oriented.svg</file>
         <file>assets/close.png</file>
+        <file>assets/upload.png</file>
+        <file>ui/DeskButton.qml</file>
     </qresource>
 </RCC>

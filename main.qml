@@ -1,10 +1,12 @@
 import QtQuick 2.5
 import QtQuick.Controls 1.4
+import QtQuick.Dialogs 1.0
 import QtQuick.Layouts 1.1
 import QtQuick.Controls.Styles 1.2
 import QtQuick.Window 2.0
 
 import "scripts/talk.js" as Talk
+import "ui"
 
 ApplicationWindow {
     id: root
@@ -26,8 +28,8 @@ ApplicationWindow {
         x: img.x - 10;
         y: img.y;
         z: 100;
-        width: 100;
-        height: 100;
+        width: 80;
+        height: 80;
 
         source: "assets/close.png"
 
@@ -42,32 +44,26 @@ ApplicationWindow {
         }
     }
 
-    /*Rectangle {
-        id: balloon
-        x: img.width + img.x
-        y: img.y
-        width: balloonLabel.width + 32
-        height: balloonLabel.maximumLineCount * balloonLabel.font.pixelSize
-        color: "white"
+    Image {
+        id: uploadButton
+        x: img.x - 10;
+        y: img.y + height + 10;
+        z: 100;
+        width: 80;
+        height: 80;
 
-        radius: 20
+        source: "assets/upload.png"
 
-        border.color: "black"
-        border.width: 2
-
-        Label {
-            anchors.centerIn: parent
-            id: balloonLabel
-            text: "Панк - это дерзость\n и молодость мира! F.P.G"
-            textFormat: Text.AutoText
-            verticalAlignment: Text.AlignVCenter
-            font.family: "Anime Ace V02"
-            font.weight: Font.Normal
-            font.pixelSize: 12
-            horizontalAlignment: Text.AlignHCenter
-            maximumLineCount: 12
+        MouseArea {
+            width: uploadButton.width
+            height: uploadButton.height
+            anchors.fill: parent;
+            onClicked: {
+                selectGirlDialog.open()
+                console.log("on upload");
+            }
         }
-    }*/
+    }
 
     Image {
             id: balloon
@@ -76,11 +72,16 @@ ApplicationWindow {
 
             x: img.width + img.x
             y: img.y
-            sourceSize.width: balloonLabel.contentWidth + 32
-            sourceSize.height: balloonLabel.contentHeight * balloonLabel.font.pixelSize
+
+            sourceSize.width: balloonLabel.contentWidth + 50
+            sourceSize.height: 200
 
             Label {
                 anchors.centerIn: parent
+
+                width: 200
+                height: parent.sourceSize.height - 20
+
                 id: balloonLabel
                 text: "Панк - это дерзость \nи молодость мира! F.P.G"
                 textFormat: Text.AutoText
@@ -89,14 +90,16 @@ ApplicationWindow {
                 font.weight: Font.Normal
                 font.pixelSize: 12
                 horizontalAlignment: Text.AlignHCenter
-                maximumLineCount: 12
-                wrapMode: Text.Wrap
+                wrapMode: Text.WordWrap
             }
+
         }
 
     Image {
 
         id: img;
+        x: 0
+        y: 0
         source: "assets/front.png";
 
 
@@ -120,9 +123,36 @@ ApplicationWindow {
                 axis: Drag.XandYAxis
             }
             onClicked: {
-                img.source = imageMouseArea.containsMouse && img.source == "assets/front.png" ? "assets/back.png" : "assets/front.png";
-                Talk.reactOnAction();
+                //Talk.reactOnAction();
+                Talk.getRandomPhrase();
             }
+            onPressAndHold: {
+                console.log("Enable zoom");
+            }
+        }
+        Timer {
+            interval: Math.random() * 10000;
+            running: true;
+            repeat: true;
+            onTriggered: Talk.getRandomPhrase();
+        }
+    }
+
+    FileDialog {
+        id: selectGirlDialog
+        title: "Select your girl"
+        folder: shortcuts.home
+        nameFilters: [ "Image file (*.svg *.png)" ]
+        onAccepted: {
+            img.source = selectGirlDialog.fileUrl.toString()
+            img.x = 0
+            img.y = 0
+            console.log("You chose: " + selectGirlDialog.fileUrls)
+            close();
+        }
+        onRejected: {
+            console.log("Canceled")
+            close();
         }
     }
 
