@@ -22,7 +22,7 @@ function calculateSpeakInterval(phrase)
 function getRandomPhrase()
 {
     if (typeof phrases !== 'undefined' && phrases.length > 0) {
-        balloonLabel.text = phrases[Math.round( Math.random() * phrases.length )].toString().replace(userPattern, defaultUser);
+        balloon.label = phrases[Math.round( Math.random() * phrases.length )].toString().replace(userPattern, defaultUser);
     } else {
         getPhrases();
     }
@@ -31,7 +31,7 @@ function getRandomPhrase()
 
 function getPhrases() {
     var request = new XMLHttpRequest();
-    request.open('GET', "https://sheets.googleapis.com/v4/spreadsheets/17qf7fRewpocQ_TT4FoKWQ3p7gU7gj4nFLbs2mJtBe_k/values/A2:A103?key=AIzaSyDExsxzBLRZgPt1mBKtPCcSDyGgsjM3_uI")
+    request.open('GET', "https://sheets.googleapis.com/v4/spreadsheets/17qf7fRewpocQ_TT4FoKWQ3p7gU7gj4nFLbs2mJtBe_k/values/A2:A105?key=AIzaSyDExsxzBLRZgPt1mBKtPCcSDyGgsjM3_uI")
 
     request.onreadystatechange = function() {
         if(request.readyState === XMLHttpRequest.DONE)

@@ -4,175 +4,69 @@ import QtQuick.Dialogs 1.0
 import QtQuick.Layouts 1.1
 import QtQuick.Controls.Styles 1.2
 import QtQuick.Window 2.0
+import QtGraphicalEffects 1.0
 
 import "scripts/talk.js" as Talk
-import "ui"
+import "scripts/controller.js" as Controller
+
+import "ui/Balloon"
+import "ui/BalloonInput"
+import "ui/DeskButton"
 
 ApplicationWindow {
-    id: root
+    id: window
 
     property int offset: 25
-
-    x: Screen.width - img.width - offset;
-    y: Screen.height;
-
+    property variant handle
     visible: true
     width: Screen.width
     height: Screen.height
-    title: "lorm"
     onClosing: Qt.quit();
-
+    modality: "NonModal";
     flags: Qt.ToolTip | Qt.FramelessWindowHint | Qt.WA_TranslucentBackground | Qt.WindowStaysOnTopHint | Qt.BypassGraphicsProxyWidget | Qt.SubWindow
     color: "transparent"
 
-    Image {
+    DeskButton {
         id: exitButton
-        x: img.x - offset;
-        y: img.y;
-        z: 100;
-        width: 80;
-        height: 80;
+        x: deskchanImage.x - offset;
+        y: deskchanImage.y;
+        image: "assets/close.png"
+        size: 60
 
-        source: "assets/close.png"
-
-        MouseArea {
-            width: exitButton.width
-            height: exitButton.height
-            anchors.fill: parent;
-            onClicked: {
-                console.log("on exit cross clicked");
-                Qt.quit();
-            }
-        }
+        onFabClicked: Qt.quit();
     }
 
-    Image {
+    DeskButton {
         id: uploadButton
-        x: img.x - offset;
-        y: img.y + height + offset;
-        z: 100;
-        width: 80;
-        height: 80;
+        x: deskchanImage.x - offset;
+        y: deskchanImage.y + height + offset;
+        image: "assets/upload.png"
+        size: 60
 
-        source: "assets/upload.png"
+        onFabClicked: selectGirlDialog.open();
+    }
 
-        MouseArea {
-            width: uploadButton.width
-            height: uploadButton.height
-            anchors.fill: parent;
-            onClicked: {
-                selectGirlDialog.open()
-                console.log("on upload");
-            }
+    DeskButton {
+        id: settingsButton
+        x: deskchanImage.x - offset;
+        y: deskchanImage.y + (height + offset) * 2;
+        image: "assets/settings.png"
+        size: 60
+
+        onFabClicked: {
+            var component = Qt.createComponent("BalloonForm.qml");
+            handle = component.createObject(window);
+            handle.show();
         }
     }
 
-    Image {
-            id: balloon
-            visible: false
-
-            source: "assets/balloon_right_oriented.svg"
-
-            x: img.width + img.x
-            y: img.y
-
-            sourceSize.width: balloonLabel.contentWidth + 100
-            sourceSize.height: 300
-
-            Label {
-                anchors.centerIn: parent
-
-                width: 200
-                height: parent.sourceSize.height - 20
-
-                id: balloonLabel
-                text: "Deskchan v.0.1 Preview \nDesigned and developed by Deskchan Project crew"
-                textFormat: Text.AutoText
-                lineHeight: 1.25
-                verticalAlignment: Text.AlignVCenter
-                font.family: "Anime Ace V02"
-                font.weight: Font.Normal
-                font.pointSize: 10
-                horizontalAlignment: Text.AlignHCenter
-                wrapMode: Text.WordWrap
-            }
-
-        }
 
     Image {
-            id: balloonWelcome
+        id: deskchanImage;
 
-            source: "assets/balloon_right_oriented.svg"
-
-            x: img.width + img.x
-            y: img.y
-
-            sourceSize.width: balloonWelcomeLabel.contentWidth + 100
-            sourceSize.height: 300
-
-            Label {
-                anchors.centerIn: parent
-
-                width: 200
-                height: parent.sourceSize.height - 20
-
-                id: balloonWelcomeLabel
-                text: "Привет! Я Deskchan v 0.0.1 Preview. Как мне к тебе обращаться?"
-                textFormat: Text.AutoText
-                lineHeight: 1.25
-                verticalAlignment: Text.AlignVCenter
-                font.family: "Anime Ace V02"
-                font.weight: Font.Normal
-                font.pointSize: 10
-                horizontalAlignment: Text.AlignHCenter
-                wrapMode: Text.WordWrap
-            }
-                TextInput {
-                    id:ballonUsernameInput
-                    width: 120
-                    height: 40
-                    horizontalAlignment: TextInput.AlignHCenter
-                    x: 70
-                    y: 200
-
-                    color: "orange"
-                    text: "faggot"
-                    font.family: "Anime Ace V02"
-                    font.weight: Font.DemiBold
-                    font.pointSize: 12
-
-                    maximumLength: 11
-                    validator: RegExpValidator { regExp: /^[a-zA-Zа-яА-Я- ]*$/ }
-
-                    onAccepted: {
-                        console.log("set default user: ", text)
-                        Talk.defaultUser = text
-                        balloonWelcome.visible = false;
-                        balloon.visible = true;
-                        timer.running = true;
-                    }
-            }
-        }
-
-    Image {
-        id: img;
-
-        mipmap: true
-        source: img.mipmap ? "assets/front.png" : "assets/back.png";
+        source: "assets/front.png";
+        transformOrigin: Image.Center;
         cache: false;
-
-
-        onXChanged: {
-            if(imageMouseArea.drag.active){
-                //console.log("img x = " + x);
-            }
-        }
-
-        onYChanged: {
-            if(imageMouseArea.drag.active){
-                //console.log("img y = " + y);
-            }
-        }
 
         MouseArea {
             id: imageMouseArea;
@@ -182,15 +76,13 @@ ApplicationWindow {
             drag {
                 minimumX: 10
                 minimumY: 10
-                maximumX: Screen.width - img.width - balloon.paintedWidth
-                maximumY: Screen.height - img.height
-                target: img;
+                maximumX: Screen.width - deskchanImage.width - balloon.paintedWidth
+                maximumY: Screen.height - deskchanImage.height
+                target: deskchanImage;
                 axis: Drag.XAndYAxis
             }
             onClicked: {
-                //img.source = "assets/back.png";
-                //Talk.reactOnAction();
-                //Talk.getRandomPhrase();
+                parent.state == "front" ? parent.state = "back" : parent.state = "front";
             }
             onPressed: {
                 imageMouseArea.cursorShape = Qt.ClosedHandCursor;
@@ -202,22 +94,77 @@ ApplicationWindow {
                 console.log("Enable zoom");
             }
             onWheel: {
+                var scaleFactor = 0.00025;
                 if (wheel.modifiers && Qt.ControlModifier) {
-                    img.scale = wheel.angleDelta.y / 120;
+                    //wheel up
+                    if(wheel.angleDelta.y > 0) {
+                        console.log("scale wheel up: ", wheel.angleDelta);
+                        deskchanImage.width = wheel.angleDelta.y * scaleFactor;
+                        deskchanImage.height = wheel.angleDelta.y * scaleFactor;
+                    }
+                    //wheel down
+                    if(wheel.angleDelta.y < 0) {
+                        deskchanImage.width = wheel.angleDelta.y / scaleFactor;
+                        deskchanImage.height = wheel.angleDelta.y / scaleFactor;
+                        console.log("scale wheel down: ", wheel.angleDelta);
+                    }
                 }
             }
         }
-        Timer {
-            id: timer
-            interval: Math.round(Math.random() * (6000 - 2000)) + 2000;
-            running: false;
-            repeat: true;
-            onTriggered: {
-                //Время высказывания высчитывается по формуле: кол-во букв * кол-во секунд на букву + кол-во пробело
-                interval = Math.round(Math.random() * (6000 - 2000)) + 2000;
-                console.log("phrase interval is", interval);
-                Talk.getRandomPhrase();
+
+        states: [
+            State {
+                name: "front";
+                PropertyChanges {
+                    target: deskchanImage;
+                    source: "assets/front.png";
+                }
+            },
+            State {
+                name: "back";
+                PropertyChanges {
+                    target: deskchanImage;
+                    source: "assets/back.png";
+                }
+            },
+            State {
+                name: "default";
+                PropertyChanges {
+                    target: deskchanImage;
+                    source: source;
+                }
             }
+        ]
+    }
+
+    Balloon {
+        id: balloon
+        show: false;
+        x: deskchanImage.width - 150 + deskchanImage.x
+        y: 10
+
+        label: "Deskchan v.0.1 Preview \nDesigned and developed by Deskchan Project crew."
+    }
+
+    BalloonInput {
+        id: balloonWelcome
+        x: deskchanImage.width - 150 + deskchanImage.x
+        y: 10
+
+        label: "Привет! Я Deskchan v 0.0.1 Preview. Как мне к тебе обращаться?"
+        onBalloonInputAccepted: Controller.welcomeInputAccepted();
+
+    }
+
+    Timer {
+        id: timer
+        interval: Math.round(Math.random() * (6000 - 2000)) + 2000;
+        running: false;
+        repeat: true;
+        onTriggered: {
+            interval = Math.round(Math.random() * (6000 - 2000)) + 2000;
+            console.log("phrase interval is", interval);
+            Talk.getRandomPhrase();
         }
     }
 
@@ -227,9 +174,8 @@ ApplicationWindow {
         folder: shortcuts.home
         nameFilters: [ "Image file (*.svg *.png)" ]
         onAccepted: {
-            img.source = selectGirlDialog.fileUrl.toString();
-            img.transformOrigin = Image.Center;
-            console.log("You chose: " + selectGirlDialog.fileUrls)
+            deskchanImage.source = selectGirlDialog.fileUrl.toString();
+            console.log("You chose: " + selectGirlDialog.fileUrls);
             close();
         }
         onRejected: {
@@ -237,5 +183,4 @@ ApplicationWindow {
             close();
         }
     }
-
 }
